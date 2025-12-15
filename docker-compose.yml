@@ -1,79 +1,170 @@
 
 services:
   db:
-    image: mariadb:11
+    image: ${DB_IMAGE:-mariadb:11.4}
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
     volumes:
-      - db_data:/var/lib/mysql:delegated
+      - db_data:/var/lib/mysql
       - ./my.cnf:/etc/mysql/conf.d/custom.cnf:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 5s
       retries: 20
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    networks:
+      - app
+    secrets:
+      - mysql_root_password
+      - mysql_password
 
   wordpress:
-    image: wordpress:latest
+    image: ${WORDPRESS_IMAGE:-wordpress:latest}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
-      - "8080:80"
+      - "${HTTP_PORT:-8080}:80"
     restart: unless-stopped
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: ${MYSQL_USER}
-      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/mysql_password
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_MEMORY_LIMIT', '256M');
         define('WP_MAX_MEMORY_LIMIT', '512M');
         define('WP_DEBUG', false);
         define('DISABLE_WP_CRON', true);
+        define('WP_ENVIRONMENT_TYPE', 'production');
+        define('DISALLOW_FILE_EDIT', true);
+        define('AUTOMATIC_UPDATER_DISABLED', true);
+        define('WP_CACHE', true);
+        define('WP_POST_REVISIONS', 10);
     volumes:
-      - wp_data:/var/www/html:cached
+      - wp_data:/var/www/html
       - ./php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
     healthcheck:
       test: ["CMD-SHELL", "[ -f /var/www/html/wp-config.php ] || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 20
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - app
+    secrets:
+      - mysql_password
 
   phpmyadmin:
-    image: phpmyadmin:latest
+    image: ${PHPMYADMIN_IMAGE:-phpmyadmin:5.2}
+    profiles: ["dev"]
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: unless-stopped
     ports:
-      - "8081:80"
+      - "${PHPMYADMIN_PORT:-8081}:80"
     environment:
       PMA_HOST: db
       PMA_PORT: 3306
       PMA_USER: ${MYSQL_USER}
-      PMA_PASSWORD: ${MYSQL_PASSWORD}
+      PMA_PASSWORD_FILE: /run/secrets/mysql_password
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - app
+    secrets:
+      - mysql_password
 
   wpcli:
     image: wordpress:cli
     depends_on:
-      - db
-      - wordpress
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: ${MYSQL_USER}
-      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/mysql_password
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
     user: "33:33"
     working_dir: /var/www/html
     volumes:
-      - wp_data:/var/www/html:cached
+      - wp_data:/var/www/html
       - ./scripts:/scripts:ro
     entrypoint: ["wp"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - app
+    secrets:
+      - mysql_password
+
+  wpcron:
+    image: wordpress:cli
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    restart: unless-stopped
+    user: "33:33"
+    working_dir: /var/www/html
+    command: bash -lc "while sleep 60; do wp cron event run --due-now --path=/var/www/html >/dev/null 2>&1; done"
+    volumes:
+      - wp_data:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/mysql_password
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - app
+    secrets:
+      - mysql_password
 
 volumes:
   db_data:
   wp_data:
 
+networks:
+  app:
+
+secrets:
+  mysql_root_password:
+    file: ./secrets/mysql_root_password
+  mysql_password:
+    file: ./secrets/mysql_password
