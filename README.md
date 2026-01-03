@@ -7,10 +7,11 @@ Quick start
 -----------
 
 - Copy `.env.example` to `.env` and adjust non-sensitive values.
-- Create Docker secrets for DB passwords:
-  - Write strong secrets into:
-    - `secrets/mysql_root_password`
-    - `secrets/mysql_password`
+- Database secrets:
+  - Development defaults live in:
+    - `secrets/mysql_root_password.default`
+    - `secrets/mysql_password.default`
+  - For production, edit those files or set `MYSQL_ROOT_PASSWORD_SECRET_FILE`/`MYSQL_PASSWORD_SECRET_FILE` to custom paths.
 - Start the stack:
   - `docker compose pull` (recommended to pre-pull pinned images)
   - `docker compose up -d`

@@ -4,10 +4,10 @@ services:
     image: ${DB_IMAGE:-mariadb:11.4}
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MARIADB_DATABASE: ${MYSQL_DATABASE}
+      MARIADB_USER: ${MYSQL_USER}
+      MARIADB_PASSWORD_FILE: /run/secrets/mysql_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
     volumes:
       - db_data:/var/lib/mysql
       - ./my.cnf:/etc/mysql/conf.d/custom.cnf:ro
@@ -156,6 +156,53 @@ services:
     secrets:
       - mysql_password
 
+  setup:
+    image: wordpress:cli
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_healthy
+    user: "33:33"
+    working_dir: /var/www/html
+    entrypoint: ["/bin/bash"]
+    command:
+      - -c
+      - |
+        # Check if WordPress is already set up
+        if wp core is-installed --path=/var/www/html 2>/dev/null; then
+          echo "✅ WordPress already initialized, skipping setup"
+          exit 0
+        fi
+        echo "🚀 Running first-time setup..."
+        sleep 5
+        bash /scripts/internal-setup.sh
+    volumes:
+      - wp_data:/var/www/html
+      - ./scripts:/scripts
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/mysql_password
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WP_URL: ${WP_URL:-http://localhost:8080}
+      WP_TITLE: ${WP_TITLE:-"Myriam Craft Store"}
+      WP_ADMIN_USER: ${WP_ADMIN_USER:-admin}
+      WP_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD:-change-me}
+      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL:-admin@example.com}
+      WP_SHOP_USER: ${WP_SHOP_USER:-myriam}
+      WP_SHOP_PASSWORD: ${WP_SHOP_PASSWORD:-change-me}
+      WP_SHOP_EMAIL: ${WP_SHOP_EMAIL:-myriam@example.com}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - app
+    secrets:
+      - mysql_password
+
 volumes:
   db_data:
   wp_data:
@@ -165,6 +212,6 @@ networks:
 
 secrets:
   mysql_root_password:
-    file: ./secrets/mysql_root_password
+    file: ${MYSQL_ROOT_PASSWORD_SECRET_FILE:-./secrets/mysql_root_password.default}
   mysql_password:
-    file: ./secrets/mysql_password
+    file: ${MYSQL_PASSWORD_SECRET_FILE:-./secrets/mysql_password.default}

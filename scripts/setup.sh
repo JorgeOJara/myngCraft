@@ -88,6 +88,9 @@ else
   install_or_activate astra-sites
 fi
 
+# Install WooCommerce Brands extension for better product organization
+install_or_activate perfect-brands-for-woocommerce
+
 echo "==> Creating users if needed"
 # Ensure admin user exists and has administrator role
 if run_wp user get "${WP_ADMIN_USER}" --path=/var/www/html >/dev/null 2>&1; then
@@ -153,3 +156,6 @@ else
   MENU_ID="$(run_wp menu create "Primary" --path=/var/www/html 2>/dev/null || true)"
   run_wp menu location assign primary primary --path=/var/www/html >/dev/null || true
 fi
+
+echo "==> Setting up Brandstore-style shop template"
+run_wp eval-file /scripts/auto-import-brandstore.php --path=/var/www/html 2>&1 | grep -v "^Warning:" || true
