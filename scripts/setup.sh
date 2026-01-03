@@ -76,6 +76,18 @@ else
   run_wp theme install astra --activate --path=/var/www/html >/dev/null
 fi
 
+echo "==> Installing page builder and starter templates"
+# Elementor (required by the requested template)
+install_or_activate elementor
+
+# Starter Templates (Astra) — prefer current slug, fallback to legacy
+if run_wp plugin install starter-templates --activate --path=/var/www/html >/dev/null 2>&1; then
+  echo "    Installed starter-templates"
+else
+  echo "    'starter-templates' not available; trying legacy 'astra-sites'"
+  install_or_activate astra-sites
+fi
+
 echo "==> Creating users if needed"
 # Ensure admin user exists and has administrator role
 if run_wp user get "${WP_ADMIN_USER}" --path=/var/www/html >/dev/null 2>&1; then
@@ -111,3 +123,33 @@ echo "WordPress URL: ${WP_URL}"
 echo "Admin: ${WP_ADMIN_USER} / ${WP_ADMIN_PASSWORD}"
 echo "Shop Manager: ${WP_SHOP_USER} / ${WP_SHOP_PASSWORD}"
 echo "phpMyAdmin: http://localhost:8081 (host: db, user: ${MYSQL_USER:-wordpress})"
+
+echo ""
+echo "==> Optional: Import Kate Stone template (Elementor)"
+echo "Go to Appearance → Starter Templates → Choose Elementor → Search 'Kate Stone' → Import Complete Site."
+echo "After import, we will try to set the Home page and Primary menu automatically."
+
+# Best-effort: if a 'Home' page exists (from manual/template import), set it as the static homepage.
+HOME_ID="$(run_wp post list --post_type=page --name=home --field=ID --path=/var/www/html 2>/dev/null || true)"
+if [[ -z "$HOME_ID" ]]; then
+  # Fallback: find by title 'Home'
+  HOME_ID="$(run_wp db query "SELECT ID FROM wp_posts WHERE post_type='page' AND post_status='publish' AND post_title='Home' LIMIT 1;" --skip-column-names --path=/var/www/html 2>/dev/null || true)"
+fi
+
+if [[ -n "${HOME_ID}" ]]; then
+  echo "==> Setting static front page to ID ${HOME_ID}"
+  run_wp option update show_on_front page --path=/var/www/html >/dev/null || true
+  run_wp option update page_on_front "${HOME_ID}" --path=/var/www/html >/dev/null || true
+fi
+
+# Best-effort: assign a Primary menu if one exists after import
+PRIMARY_MENU_ID="$(run_wp menu list --fields=term_id,slug --format=csv --path=/var/www/html 2>/dev/null | awk -F, 'NR>1 && tolower($2) ~ /primary/ {print $1; exit}')"
+if [[ -n "${PRIMARY_MENU_ID}" ]]; then
+  echo "==> Assigning existing Primary menu to 'primary' location"
+  run_wp menu location assign "${PRIMARY_MENU_ID}" primary --path=/var/www/html >/dev/null || true
+else
+  # Create a menu if none exists and attempt to assign
+  echo "==> Creating and assigning Primary menu"
+  MENU_ID="$(run_wp menu create "Primary" --path=/var/www/html 2>/dev/null || true)"
+  run_wp menu location assign primary primary --path=/var/www/html >/dev/null || true
+fi

@@ -97,6 +97,20 @@ Add more categories at: **Products → Categories**
 2. Navigate to **WooCommerce → Product**
 3. Adjust layout and image gallery settings
 
+### Import an Astra Starter Template (Kate Stone)
+
+If you want to use the "Kate Stone – Designer Bio 02" design (Elementor):
+
+1. Install required plugins via script:
+   - Run: `bash scripts/install-starter-templates.sh`
+2. In WordPress Admin, go to: **Appearance → Starter Templates**
+3. Choose **Elementor** as the page builder
+4. Search for: `Kate Stone` (Designer Bio 02)
+5. Click **Import Complete Site** (or import selected templates)
+6. After import:
+   - Set homepage at **Settings → Reading** (choose the imported Home page)
+   - Assign menu at **Appearance → Menus** (set Primary)
+
 ## 💳 Setting Up Payment Methods
 
 1. Go to **WooCommerce → Settings → Payments**
