@@ -2,3 +2,7 @@
 *.log
 .DS_Store
 secrets/
+backups/
+uploads-backup/
+*.sql
+*.tar.gz
