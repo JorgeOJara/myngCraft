@@ -1,0 +1,51 @@
+<%- include('partials/head', { adminPage: false }) %>
+<body>
+<%- include('partials/header') %>
+<main>
+  <section class="product-detail-section">
+    <div class="shell product-detail-grid">
+      <div class="product-detail-image reveal">
+        <img src="<%= imageForProduct(product) %>" alt="<%= product.name %>">
+        <% if (product.featured) { %><span class="product-badge">Myng's pick</span><% } %>
+      </div>
+      <div class="product-detail-copy reveal reveal-late">
+        <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/shop">Shop</a><span>/</span><a href="/shop?category=<%= encodeURIComponent(product.category) %>"><%= product.category %></a></nav>
+        <p class="eyebrow"><%= product.category.toUpperCase() %></p>
+        <div class="product-title-row"><h1><%= product.name %></h1>
+          <% if (customer) { %><form method="post" action="/account/favorites/<%= product.id %>/toggle"><input type="hidden" name="_csrf" value="<%= customerCsrf %>"><input type="hidden" name="return_to" value="/product/<%= product.slug %>"><button class="detail-favorite <%= favoriteIds.has(product.id) ? 'is-favorite' : '' %>" type="submit"><%= favoriteIds.has(product.id) ? '♥ Saved' : '♡ Save' %></button></form>
+          <% } else { %><a class="detail-favorite" href="/account/sign-in?return=<%= encodeURIComponent(`/product/${product.slug}`) %>">♡ Save</a><% } %>
+        </div>
+        <p class="detail-price"><%= money(product.price_cents) %></p>
+        <div class="detail-description"><p><%= product.description %></p></div>
+
+        <% if (Number.isInteger(product.price_cents) && product.price_cents > 0 && product.stock_quantity > 0) { %>
+          <div class="purchase-row">
+            <label for="quantity">Qty</label>
+            <select id="quantity" data-product-quantity>
+              <% for (let quantity = 1; quantity <= Math.min(product.stock_quantity, 10); quantity++) { %><option value="<%= quantity %>"><%= quantity %></option><% } %>
+            </select>
+            <button class="button button-primary button-grow" type="button"
+              data-add-to-cart
+              data-product-id="<%= product.id %>"
+              data-product-name="<%= product.name %>"
+              data-product-price="<%= product.price_cents %>"
+              data-product-image="<%= imageForProduct(product) %>"
+              data-product-slug="<%= product.slug %>">Add to bag</button>
+          </div>
+          <p class="stock-note"><span></span><%= product.stock_quantity %> available</p>
+        <% } else { %>
+          <div class="coming-soon-panel"><strong>This piece is not ready to order online yet.</strong><p>Send Myng a note for availability or custom-order questions.</p><a class="button button-outline" href="/contact">Ask about this piece</a></div>
+        <% } %>
+
+        <div class="detail-promises">
+          <div><span>♡</span><p><strong>Made with care</strong><small>Thoughtful small-batch work</small></p></div>
+          <div><span>⌁</span><p><strong>Gift-ready</strong><small>Wrapped with a personal touch</small></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <% if (related.length) { %>
+    <section class="section related-section"><div class="shell"><div class="section-heading centered"><p class="eyebrow">YOU MAY ALSO LIKE</p><h2>More from the worktable.</h2></div><div class="product-grid"><% related.forEach((item) => { %><%- include('partials/product-card', { product: item }) %><% }) %></div></div></section>
+  <% } %>
+</main>
+<%- include('partials/footer') %>

@@ -1,0 +1,37 @@
+services:
+  web:
+    build:
+      context: .
+    image: myngcraft2:local
+    restart: unless-stopped
+    init: true
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    ports:
+      - "127.0.0.1:8080:1010"
+    volumes:
+      - ./data:/app/data
+      - ./public/uploads:/app/public/uploads
+    read_only: true
+    mem_limit: 512m
+    pids_limit: 128
+    stop_grace_period: 15s
+    tmpfs:
+      - /tmp:size=64m,mode=1777,noexec,nosuid,nodev
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "bun", "-e", "const response = await fetch('http://127.0.0.1:1010/'); if (!response.ok) process.exit(1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

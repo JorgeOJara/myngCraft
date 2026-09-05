@@ -1,0 +1,20 @@
+<%- include('../partials/head', { adminPage: false }) %>
+<body>
+<%- include('../partials/header') %>
+<main class="account-page">
+  <section class="account-welcome compact-account-welcome"><div class="shell"><p class="eyebrow">MY ACCOUNT</p><h1>My orders</h1><p>Follow current work and look back at everything you’ve ordered.</p></div></section>
+  <div class="shell account-shell">
+    <%- include('nav') %>
+    <section class="account-section-block first-account-block">
+      <div class="account-section-heading"><div><p class="eyebrow">CURRENT</p><h2>What’s happening now</h2></div></div>
+      <% if (currentOrders.length) { %><div class="customer-order-grid"><% currentOrders.forEach((order) => { %><%- include('order-card', { order }) %><% }) %></div>
+      <% } else { %><div class="account-empty"><span>□</span><div><h3>No active orders.</h3><p>Your next order will appear here as soon as it’s placed.</p></div><a class="button button-outline" href="/shop">Browse the shop</a></div><% } %>
+    </section>
+    <section class="account-section-block" id="history">
+      <div class="account-section-heading"><div><p class="eyebrow">HISTORY</p><h2>Previous orders</h2></div></div>
+      <% if (pastOrders.length) { %><div class="customer-order-grid"><% pastOrders.forEach((order) => { %><%- include('order-card', { order }) %><% }) %></div>
+      <% } else { %><div class="account-empty simple-account-empty"><span>◇</span><div><h3>No previous orders yet.</h3><p>Completed and cancelled orders will be kept here for you.</p></div></div><% } %>
+    </section>
+  </div>
+</main>
+<%- include('../partials/footer') %>

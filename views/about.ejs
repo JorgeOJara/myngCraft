@@ -1,0 +1,40 @@
+<%- include('partials/head', { adminPage: false }) %>
+<body>
+<%- include('partials/header') %>
+<main>
+  <section class="about-hero">
+    <div class="shell about-hero-grid">
+      <div class="about-hero-copy reveal">
+        <p class="eyebrow">OUR LITTLE STORY</p>
+        <h1><%= settings.story_heading %></h1>
+        <p><%= settings.story_text %></p>
+        <p class="signature">Myng</p>
+      </div>
+      <div class="about-hero-images reveal reveal-late">
+        <img class="about-image-main" src="/images/myngcraft-cat-jewelry.jpg" alt="Handmade jewelry styled on a warm neutral surface">
+        <img class="about-image-small" src="/images/myngcraft-cat-textiles.jpg" alt="Soft handmade textiles">
+        <span class="about-flower" aria-hidden="true">❋</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="values-section">
+    <div class="shell">
+      <div class="section-heading centered"><p class="eyebrow">WHAT MATTERS HERE</p><h2>Simple things, made meaningful.</h2></div>
+      <div class="value-grid">
+        <article><span>01</span><h3>Made in small batches</h3><p>Focused collections make each piece easier to notice, choose, and love.</p></article>
+        <article><span>02</span><h3>Thoughtful details</h3><p>Texture, color, and usefulness guide every item that reaches the shop.</p></article>
+        <article><span>03</span><h3>Personal connection</h3><p>Questions are answered by a real maker, with room for custom ideas.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-cta">
+    <div class="shell about-cta-inner">
+      <p class="eyebrow">FROM MYNG'S HANDS TO YOURS</p>
+      <h2>Find the piece that feels like you.</h2>
+      <div><a class="button button-light" href="/shop">Browse the shop</a><a class="text-link light-link" href="/contact">Say hello <span>→</span></a></div>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

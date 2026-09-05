@@ -1,0 +1,27 @@
+<%- include('../partials/head', { adminPage: false }) %>
+<body>
+<%- include('../partials/header') %>
+<main>
+  <section class="customer-auth-section">
+    <div class="shell customer-auth-grid">
+      <div class="customer-auth-card reveal">
+        <p class="eyebrow">WELCOME BACK</p>
+        <h1>Sign in to your little corner.</h1>
+        <p>See your favorites, saved bag, messages, and every order in one calm place.</p>
+        <% if (error) { %><div class="account-alert account-alert-error" role="alert"><%= error %></div><% } %>
+        <form class="customer-auth-form" method="post" action="/account/sign-in">
+          <input type="hidden" name="return_to" value="<%= returnTo %>">
+          <label for="customer-email">Email address<input id="customer-email" name="email" type="email" value="<%= email %>" autocomplete="email" required autofocus></label>
+          <label for="customer-password">Password<div class="customer-password-field"><input id="customer-password" name="password" type="password" maxlength="128" autocomplete="current-password" required><button type="button" data-customer-password-toggle>Show</button></div></label>
+          <button class="button button-primary customer-auth-submit" type="submit">Sign in to my account</button>
+        </form>
+        <p class="auth-switch">New to Myng's Crafts? <a href="/account/create?return=<%= encodeURIComponent(returnTo) %>">Create your account</a></p>
+      </div>
+      <aside class="customer-auth-aside reveal reveal-late">
+        <img src="/images/myngcraft-hero.png" alt="Handmade jewelry and gifts styled in soft natural light">
+        <div><span>♡</span><h2>Keep the things you love close.</h2><p>Save favorites now and come back to them anytime.</p></div>
+      </aside>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

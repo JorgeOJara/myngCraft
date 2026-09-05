@@ -1,0 +1,11 @@
+<a class="customer-order-card" href="/account/orders/<%= order.order_number %>">
+  <div class="customer-order-card-top">
+    <div><small>ORDER</small><strong><%= order.order_number %></strong></div>
+    <span class="customer-status status-<%= order.status %>"><%= statusLabel(order.status) %></span>
+  </div>
+  <div class="customer-order-card-bottom">
+    <p><small>PLACED</small><strong><%= formatDate(order.created_at) %></strong></p>
+    <p><small>TOTAL</small><strong><%= money(order.total_cents) %></strong></p>
+    <b>View order <span>→</span></b>
+  </div>
+</a>

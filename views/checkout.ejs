@@ -1,0 +1,50 @@
+<%- include('partials/head', { adminPage: false }) %>
+<body>
+<%- include('partials/header') %>
+<main>
+  <section class="checkout-section" data-checkout-page data-free-shipping="<%= settings.free_shipping_cents %>" data-flat-shipping="<%= settings.flat_shipping_cents %>">
+    <div class="shell">
+      <div class="checkout-heading"><p class="eyebrow">CHECKOUT</p><h1>Where should your pieces go?</h1><p>Your order is saved first. <%= settings.checkout_note %></p></div>
+      <div class="checkout-grid">
+        <form class="checkout-form" data-checkout-form>
+          <div class="checkout-form-section">
+            <span class="form-step">1</span><div><h2>Your details</h2><p>So Myng knows who the order is for.</p></div>
+            <div class="form-grid">
+              <label class="field-full">Full name<input name="name" value="<%= `${customer.first_name} ${customer.last_name}` %>" autocomplete="name" required></label>
+              <label>Email address<input name="email" type="email" value="<%= customer.email %>" autocomplete="email" required></label>
+              <label>Phone (optional)<input name="phone" type="tel" value="<%= customer.phone %>" autocomplete="tel"></label>
+            </div>
+          </div>
+          <div class="checkout-form-section">
+            <span class="form-step">2</span><div><h2>Delivery address</h2><p>Where the order will be sent.</p></div>
+            <div class="form-grid">
+              <label class="field-full">Street address<input name="addressLine1" value="<%= customer.address_line_1 %>" autocomplete="address-line1" required></label>
+              <label class="field-full">Apartment, suite, etc. (optional)<input name="addressLine2" value="<%= customer.address_line_2 %>" autocomplete="address-line2"></label>
+              <label>City<input name="city" value="<%= customer.city %>" autocomplete="address-level2" required></label>
+              <label>State<input name="state" value="<%= customer.state %>" autocomplete="address-level1" required></label>
+              <label>ZIP / postal code<input name="postalCode" value="<%= customer.postal_code %>" autocomplete="postal-code" required></label>
+            </div>
+          </div>
+          <div class="checkout-form-section">
+            <span class="form-step">3</span><div><h2>A note for Myng</h2><p>Optional: gift details, color ideas, or helpful delivery notes.</p></div>
+            <label class="field-full"><span class="sr-only">Order note</span><textarea name="notes" rows="4" placeholder="Write your note here…"></textarea></label>
+          </div>
+          <div class="checkout-error" role="alert" data-checkout-error hidden></div>
+          <button class="button button-primary checkout-submit" type="submit" data-checkout-submit>Send my order request</button>
+          <p class="safe-note">🔒 Your details are used only to fulfill this order.</p>
+        </form>
+        <aside class="order-summary">
+          <h2>Your order</h2>
+          <div data-checkout-items></div>
+          <div class="summary-totals">
+            <p><span>Subtotal</span><strong data-checkout-subtotal>$0.00</strong></p>
+            <p><span>Shipping</span><strong data-checkout-shipping>$0.00</strong></p>
+            <p class="summary-total"><span>Total</span><strong data-checkout-total>$0.00</strong></p>
+          </div>
+          <p class="order-summary-note"><span>♡</span> Every order is reviewed personally by Myng.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

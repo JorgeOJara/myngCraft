@@ -1,0 +1,35 @@
+<%- include('../partials/head', { adminPage: true }) %>
+<body class="admin-body">
+<%- include('../partials/admin-header') %>
+  <div class="admin-page-heading">
+    <div><a class="admin-back" href="/admin">← Owner home</a><h1>My items</h1><p>See what customers can buy and what is still a draft.</p></div>
+    <a class="admin-primary-button" href="/admin/products/new"><span>＋</span> Add a new item</a>
+  </div>
+  <% if (notice) { %><div class="admin-alert alert-success" role="status">✓ <%= notice %></div><% } %>
+
+  <section class="admin-panel product-list-panel">
+    <% if (products.length) { %>
+      <div class="admin-product-list">
+        <% products.forEach((product) => { %>
+          <article class="admin-product-row">
+            <img src="<%= imageForProduct(product) %>" alt="">
+            <div class="admin-product-name"><strong><%= product.name %></strong><small><%= product.category %></small></div>
+            <div class="admin-product-price"><small>Price</small><strong><%= money(product.price_cents) %></strong></div>
+            <div class="admin-product-stock"><small>Available</small><strong class="<%= product.stock_quantity <= 1 ? 'low-stock' : '' %>"><%= product.stock_quantity %></strong></div>
+            <div><span class="status-pill status-<%= product.status %>"><%= statusLabel(product.status) %></span></div>
+            <div class="admin-row-actions">
+              <a class="edit-button" href="/admin/products/<%= product.id %>/edit">Edit</a>
+              <form method="post" action="/admin/products/<%= product.id %>/status">
+                <input type="hidden" name="_csrf" value="<%= csrf %>">
+                <input type="hidden" name="status" value="<%= product.status === 'active' ? 'draft' : 'active' %>">
+                <button class="quiet-button" type="submit"><%= product.status === 'active' ? 'Hide' : 'Show in shop' %></button>
+              </form>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="admin-empty roomy"><span>◇</span><h2>Your first item starts here.</h2><p>Add a photo, price, and quantity. The form will guide you.</p><a class="admin-primary-button" href="/admin/products/new">＋ Add my first item</a></div>
+    <% } %>
+  </section>
+<%- include('../partials/admin-footer') %>

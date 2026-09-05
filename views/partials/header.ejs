@@ -1,0 +1,26 @@
+<% if (settings.announcement) { %>
+  <div class="announcement" role="note"><%= settings.announcement %></div>
+<% } %>
+<header class="site-header" data-site-header>
+  <div class="shell header-inner">
+    <a class="brand" href="/" aria-label="<%= settings.store_name %> home">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <span class="brand-copy"><strong><%= settings.store_name %></strong><small><%= settings.tagline %></small></span>
+    </a>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-button>
+      <span></span><span></span><span></span><span class="sr-only">Open menu</span>
+    </button>
+    <nav class="site-menu" id="site-menu" aria-label="Main navigation" data-menu>
+      <a href="/shop" class="<%= currentPath === '/shop' || currentPath.startsWith('/product') ? 'is-current' : '' %>">Shop</a>
+      <a href="/about" class="<%= currentPath === '/about' ? 'is-current' : '' %>">Our story</a>
+      <a href="/contact" class="<%= currentPath === '/contact' ? 'is-current' : '' %>">Contact</a>
+      <a class="account-link <%= currentPath.startsWith('/account') ? 'is-current' : '' %>" href="<%= customer ? '/account' : '/account/sign-in' %>">
+        <span><%= customer ? 'My account' : 'Sign in' %></span>
+      </a>
+      <a class="bag-link <%= currentPath === '/cart' ? 'is-current' : '' %>" href="/cart" aria-label="Shopping bag">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8.5h11l1 12h-13l1-12Z"/><path d="M9 9V6.8a3 3 0 0 1 6 0V9"/></svg>
+        <span>Bag</span><span class="cart-count" data-cart-count>0</span>
+      </a>
+    </nav>
+  </div>
+</header>

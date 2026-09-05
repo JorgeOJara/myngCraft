@@ -1,0 +1,50 @@
+<%- include('../partials/head', { adminPage: true }) %>
+<body class="admin-body">
+<%- include('../partials/admin-header') %>
+  <div class="admin-page-heading compact-heading">
+    <div><a class="admin-back" href="/admin/products">← Back to my items</a><h1><%= formTitle %></h1><p><%= formHint %></p></div>
+  </div>
+  <% if (errors.length) { %><div class="admin-alert alert-error" role="alert"><strong>Please fix these details:</strong><ul><% errors.forEach((error) => { %><li><%= error %></li><% }) %></ul></div><% } %>
+
+  <form class="item-form" method="post" enctype="multipart/form-data" action="<%= product.id ? `/admin/products/${product.id}` : '/admin/products' %>">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <section class="form-card">
+      <div class="form-card-number">1</div>
+      <div class="form-card-heading"><h2>Add a clear photo</h2><p>One bright, close photo works best. JPG, PNG, or WebP; up to 8 MB.</p></div>
+      <div class="photo-uploader" data-photo-uploader>
+        <div class="photo-preview <%= product.image_path ? 'has-image' : '' %>" data-photo-preview>
+          <% if (product.image_path) { %><img src="<%= product.image_path %>" alt="Current product photo"><% } else { %><span>＋</span><p>Your photo will appear here</p><% } %>
+        </div>
+        <div><label class="upload-button" for="image"><%= product.image_path ? 'Choose a different photo' : 'Choose a photo' %></label><input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" data-photo-input><small>You can keep the current photo by leaving this alone.</small></div>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <div class="form-card-number">2</div>
+      <div class="form-card-heading"><h2>Tell customers what it is</h2><p>Use a short, clear name and choose where it belongs.</p></div>
+      <div class="large-fields">
+        <label>Item name <span>Required</span><input name="name" value="<%= product.name %>" placeholder="Example: Rose quartz drop earrings" required></label>
+        <label>Collection<select name="category"><% categories.forEach((category) => { %><option value="<%= category %>" <%= product.category === category ? 'selected' : '' %>><%= category %></option><% }) %></select></label>
+        <label>Short description <span>Optional</span><textarea name="description" rows="5" placeholder="What makes this piece special? Include size, materials, and care notes."><%= product.description %></textarea></label>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <div class="form-card-number">3</div>
+      <div class="form-card-heading"><h2>Set the price and quantity</h2><p>The shop automatically stops taking orders when quantity reaches zero.</p></div>
+      <div class="money-stock-grid">
+        <label>Price <span>US dollars</span><div class="money-input"><b>$</b><input name="price" inputmode="decimal" value="<%= Number.isInteger(product.price_cents) ? (product.price_cents / 100).toFixed(2) : '' %>" placeholder="35.00"></div></label>
+        <label>How many are available?<input name="stock_quantity" type="number" inputmode="numeric" min="0" max="9999" value="<%= product.stock_quantity %>" required></label>
+      </div>
+    </section>
+
+    <section class="form-card form-card-final">
+      <div class="form-card-number">4</div>
+      <div class="form-card-heading"><h2>Choose where it appears</h2><p>You are always in control. Hidden items stay saved but customers cannot see them.</p></div>
+      <label class="big-toggle"><input type="checkbox" name="published" <%= product.status === 'active' ? 'checked' : '' %>><span class="toggle-track"><i></i></span><span><strong>Show this item in the shop</strong><small>Turn this off to save it as a hidden draft.</small></span></label>
+      <label class="big-toggle"><input type="checkbox" name="featured" <%= product.featured ? 'checked' : '' %>><span class="toggle-track"><i></i></span><span><strong>Feature it on the home page</strong><small>Use this for a favorite or newest piece.</small></span></label>
+    </section>
+
+    <div class="sticky-save-bar"><p><strong>Ready?</strong> Save your work. You can change it anytime.</p><a href="/admin/products" class="quiet-button">Cancel</a><button class="admin-primary-button save-item-button" type="submit">✓ Save this item</button></div>
+  </form>
+<%- include('../partials/admin-footer') %>

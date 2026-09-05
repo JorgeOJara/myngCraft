@@ -1,0 +1,46 @@
+<%- include('../partials/head', { adminPage: false }) %>
+<body>
+<%- include('../partials/header') %>
+<main class="account-page">
+  <section class="account-welcome compact-account-welcome"><div class="shell"><p class="eyebrow">ORDER <%= order.order_number %></p><div class="customer-order-title"><h1><%= statusLabel(order.status) %></h1><span class="customer-status status-<%= order.status %>"><%= statusLabel(order.status) %></span></div><p>Placed on <%= formatDate(order.created_at) %> · Total <%= money(order.total_cents) %></p></div></section>
+  <div class="shell account-shell">
+    <%- include('nav') %>
+    <a class="account-back-link" href="/account/orders">← Back to my orders</a>
+
+    <% if (order.status === 'cancelled') { %><div class="order-cancelled-note"><strong>This order was cancelled.</strong><p>If that doesn’t look right, send Myng a message below.</p></div><% } else { %>
+      <section class="customer-tracking-card">
+        <div class="account-section-heading"><div><p class="eyebrow">ORDER STATUS</p><h2>Here’s what’s happening.</h2></div></div>
+        <ol class="tracking-timeline">
+          <% orderSteps(order.status).forEach((step) => { %><li class="is-<%= step.state %>"><span><%= step.state === 'complete' ? '✓' : step.state === 'current' ? '●' : '' %></span><div><strong><%= step.label %></strong><small><%= step.note %></small></div></li><% }) %>
+        </ol>
+      </section>
+    <% } %>
+
+    <div class="customer-order-detail-grid">
+      <section class="customer-detail-card">
+        <h2>Pieces in this order</h2>
+        <% order.items.forEach((item) => { %><div class="customer-order-item"><img src="<%= item.product_image || '/images/myngcraft-cat-jewelry.jpg' %>" alt=""><div><strong><%= item.product_name %></strong><small><%= money(item.unit_price_cents) %> × <%= item.quantity %></small></div><b><%= money(item.line_total_cents) %></b></div><% }) %>
+        <div class="customer-order-totals"><p><span>Subtotal</span><strong><%= money(order.subtotal_cents) %></strong></p><p><span>Shipping</span><strong><%= order.shipping_cents ? money(order.shipping_cents) : 'Free' %></strong></p><p><span>Total</span><strong><%= money(order.total_cents) %></strong></p></div>
+      </section>
+      <aside class="customer-detail-card delivery-card"><h2>Delivery information</h2><p><strong><%= order.customer_name %></strong><br><%= order.address_line_1 %><br><% if (order.address_line_2) { %><%= order.address_line_2 %><br><% } %><%= order.city %>, <%= order.state %> <%= order.postal_code %></p><p><small>Contact</small><br><%= order.email %><% if (order.phone) { %><br><%= order.phone %><% } %></p></aside>
+    </div>
+
+    <section class="order-conversation" id="conversation">
+      <div class="account-section-heading"><div><p class="eyebrow">TALK WITH MYNG</p><h2>Messages about this order</h2><p>Ask a question or share a detail without losing the order context.</p></div></div>
+      <% if (messageSent) { %><div class="account-alert account-alert-success">✓ Your message was sent to Myng.</div><% } %>
+      <% if (messageError) { %><div class="account-alert account-alert-error"><%= messageError %></div><% } %>
+      <div class="conversation-thread">
+        <% if (order.messages.length) { %>
+          <% order.messages.forEach((message) => { %><article class="conversation-message message-<%= message.sender_role %>"><div><strong><%= message.sender_role === 'customer' ? 'You' : 'Myng' %></strong><time><%= formatDate(message.created_at, true) %></time></div><p><%= message.body %></p></article><% }) %>
+        <% } else { %><div class="conversation-empty"><span>✉</span><p>No messages yet. This is the best place to ask Myng about this order.</p></div><% } %>
+      </div>
+      <form class="conversation-form" method="post" action="/account/orders/<%= order.order_number %>/messages">
+        <input type="hidden" name="_csrf" value="<%= customerCsrf %>">
+        <label for="order-message">Write a message</label>
+        <textarea id="order-message" name="message" rows="4" placeholder="Example: Could this order be wrapped as a gift?" required></textarea>
+        <button class="button button-primary" type="submit">Send message to Myng</button>
+      </form>
+    </section>
+  </div>
+</main>
+<%- include('../partials/footer') %>

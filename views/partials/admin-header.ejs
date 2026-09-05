@@ -1,0 +1,32 @@
+<header class="admin-topbar">
+  <a class="admin-brand" href="/admin"><span>M</span><strong>Myng's owner area</strong></a>
+  <div class="admin-top-actions">
+    <a class="admin-view-shop" href="/" target="_blank">View my shop <span aria-hidden="true">↗</span></a>
+    <form method="post" action="/admin/logout">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <button class="quiet-button" type="submit">Sign out</button>
+    </form>
+  </div>
+</header>
+<div class="admin-layout">
+  <nav class="admin-nav" aria-label="Owner navigation">
+    <a href="/admin" class="<%= currentPath === '/admin' ? 'is-current' : '' %>">
+      <span aria-hidden="true">⌂</span> Home
+    </a>
+    <a href="/admin/products" class="<%= currentPath.startsWith('/admin/products') ? 'is-current' : '' %>">
+      <span aria-hidden="true">◇</span> My items
+    </a>
+    <a href="/admin/orders" class="<%= currentPath.startsWith('/admin/orders') ? 'is-current' : '' %>">
+      <span aria-hidden="true">□</span> Orders
+    </a>
+    <a href="/admin/messages" class="<%= currentPath.startsWith('/admin/messages') ? 'is-current' : '' %>">
+      <span aria-hidden="true">✉</span> Messages
+    </a>
+    <a href="/admin/customers" class="<%= currentPath.startsWith('/admin/customers') ? 'is-current' : '' %>">
+      <span aria-hidden="true">♙</span> Customers
+    </a>
+    <a href="/admin/settings" class="<%= currentPath.startsWith('/admin/settings') ? 'is-current' : '' %>">
+      <span aria-hidden="true">⚙</span> Store settings
+    </a>
+  </nav>
+  <main class="admin-main">

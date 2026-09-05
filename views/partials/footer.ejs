@@ -1,0 +1,37 @@
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div class="footer-brand">
+      <a class="brand brand-light" href="/">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span class="brand-copy"><strong><%= settings.store_name %></strong><small><%= settings.tagline %></small></span>
+      </a>
+      <p>Handmade treasures for wearing, sharing, and keeping close.</p>
+    </div>
+    <div>
+      <h2>Explore</h2>
+      <a href="/shop">Shop all</a>
+      <a href="/shop?category=Jewelry">Jewelry</a>
+      <a href="/about">Our story</a>
+    </div>
+    <div>
+      <h2>Here to help</h2>
+      <a href="/contact">Contact Myng</a>
+      <a href="/cart">Your bag</a>
+      <a href="<%= customer ? '/account/orders' : '/account/sign-in' %>">Your orders</a>
+      <a href="<%= customer ? '/account/favorites' : '/account/sign-in' %>">Your favorites</a>
+      <% if (settings.contact_email) { %><a href="mailto:<%= settings.contact_email %>"><%= settings.contact_email %></a><% } %>
+    </div>
+    <div class="footer-note">
+      <h2>A thoughtful little note</h2>
+      <p>Questions and custom-order ideas are always welcome.</p>
+      <a class="text-link light-link" href="/contact">Send a message <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+  <div class="shell footer-bottom">
+    <span>© <%= year %> <%= settings.store_name %></span>
+    <span><a href="<%= customer ? '/account' : '/account/sign-in' %>"><%= customer ? 'My account' : 'Customer sign in' %></a> &nbsp;·&nbsp; <a href="/admin/login">Owner sign in</a></span>
+  </div>
+</footer>
+<div class="toast" role="status" aria-live="polite" data-toast></div>
+</body>
+</html>

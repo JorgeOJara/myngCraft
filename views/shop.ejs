@@ -1,0 +1,49 @@
+<%- include('partials/head', { adminPage: false }) %>
+<body>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero shop-hero">
+    <div class="shell page-hero-inner">
+      <p class="eyebrow">THE SHOP</p>
+      <h1>Find a little something<br><em>made with heart.</em></h1>
+      <p>Small-batch jewelry, keepsakes, and thoughtful details for everyday life.</p>
+    </div>
+  </section>
+
+  <section class="shop-section">
+    <div class="shell">
+      <form class="shop-tools" method="get" action="/shop">
+        <div class="category-pills" aria-label="Filter by collection">
+          <a class="<%= !category ? 'is-active' : '' %>" href="/shop<%= search ? `?q=${encodeURIComponent(search)}` : '' %>">All pieces</a>
+          <% categories.forEach((item) => { %>
+            <a class="<%= category === item ? 'is-active' : '' %>" href="/shop?category=<%= encodeURIComponent(item) %><%= search ? `&q=${encodeURIComponent(search)}` : '' %>"><%= item %></a>
+          <% }) %>
+        </div>
+        <div class="shop-search">
+          <label class="sr-only" for="shop-search">Search the shop</label>
+          <input id="shop-search" type="search" name="q" value="<%= search %>" placeholder="Search pieces…">
+          <% if (category) { %><input type="hidden" name="category" value="<%= category %>"><% } %>
+          <button type="submit" aria-label="Search">⌕</button>
+        </div>
+      </form>
+
+      <div class="shop-result-heading">
+        <p><strong><%= products.length %></strong> <%= products.length === 1 ? 'piece' : 'pieces' %><%= category ? ` in ${category}` : '' %><%= search ? ` matching “${search}”` : '' %></p>
+      </div>
+
+      <% if (products.length) { %>
+        <div class="product-grid shop-product-grid">
+          <% products.forEach((product) => { %><%- include('partials/product-card', { product }) %><% }) %>
+        </div>
+      <% } else { %>
+        <div class="store-empty large-empty">
+          <span>✦</span>
+          <h2>No pieces here just yet.</h2>
+          <p>Myng adds work in small batches. Try another collection or check back soon.</p>
+          <a class="button button-outline" href="/shop">See all pieces</a>
+        </div>
+      <% } %>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

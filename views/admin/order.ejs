@@ -1,0 +1,47 @@
+<%- include('../partials/head', { adminPage: true }) %>
+<body class="admin-body">
+<%- include('../partials/admin-header') %>
+  <div class="admin-page-heading order-heading">
+    <div><a class="admin-back" href="/admin/orders">← Back to orders</a><div class="title-with-status"><h1><%= order.order_number %></h1><span class="status-pill status-<%= order.status %>"><%= statusLabel(order.status) %></span></div><p>Placed <%= formatDate(order.created_at, true) %></p></div>
+    <a class="admin-secondary-button" href="mailto:<%= order.email %>?subject=<%= encodeURIComponent(`Your ${settings.store_name} order ${order.order_number}`) %>">Email <%= order.customer_name.split(' ')[0] %></a>
+  </div>
+  <% if (notice) { %><div class="admin-alert alert-success">✓ <%= notice %></div><% } %>
+
+  <div class="order-detail-grid">
+    <div>
+      <section class="admin-panel order-items-card">
+        <div class="panel-heading"><h2>Items</h2></div>
+        <% order.items.forEach((item) => { %><div class="order-detail-item"><img src="<%= item.product_image || '/images/myngcraft-cat-jewelry.jpg' %>" alt=""><div><strong><%= item.product_name %></strong><small><%= money(item.unit_price_cents) %> × <%= item.quantity %></small></div><b><%= money(item.line_total_cents) %></b></div><% }) %>
+        <div class="order-money"><p><span>Subtotal</span><strong><%= money(order.subtotal_cents) %></strong></p><p><span>Shipping</span><strong><%= order.shipping_cents === 0 ? 'Free' : money(order.shipping_cents) %></strong></p><p><span>Total</span><strong><%= money(order.total_cents) %></strong></p></div>
+      </section>
+      <section class="admin-panel order-status-card">
+        <div class="panel-heading"><div><h2>What happens next?</h2><p>Choose the current step, then save.</p></div></div>
+        <form method="post" action="/admin/orders/<%= order.id %>/status">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <div class="status-choice-grid">
+            <% [['new','Order received'],['confirmed','In process'],['making','Working on it'],['ready','Sent'],['completed','Delivered'],['cancelled','Cancelled']].forEach(([value,label]) => { %>
+              <label class="status-choice"><input type="radio" name="status" value="<%= value %>" <%= order.status === value ? 'checked' : '' %>><span><i class="status-dot status-<%= value %>"></i><strong><%= label %></strong></span></label>
+            <% }) %>
+          </div>
+          <button class="admin-primary-button" type="submit">Save order status</button>
+        </form>
+      </section>
+      <section class="admin-panel admin-conversation" id="conversation">
+        <div class="panel-heading"><div><p class="admin-eyebrow">CUSTOMER CONVERSATION</p><h2>Messages about this order</h2><p>Both sides can always see the full conversation here.</p></div></div>
+        <% if (messageSent) { %><div class="admin-alert alert-success conversation-alert">✓ Your reply was added to the order.</div><% } %>
+        <% if (messageError) { %><div class="admin-alert alert-error conversation-alert"><%= messageError %></div><% } %>
+        <div class="admin-conversation-thread">
+          <% if (orderMessages.length) { %><% orderMessages.forEach((message) => { %><article class="admin-chat-message chat-<%= message.sender_role %>"><div><strong><%= message.sender_role === 'admin' ? 'You (Myng)' : order.customer_name %></strong><time><%= formatDate(message.created_at, true) %></time></div><p><%= message.body %></p></article><% }) %>
+          <% } else { %><div class="admin-empty"><span>✉</span><p>No messages about this order yet.</p></div><% } %>
+        </div>
+        <form class="admin-reply-form" method="post" action="/admin/orders/<%= order.id %>/messages"><input type="hidden" name="_csrf" value="<%= csrf %>"><label for="admin-order-message">Reply to <%= order.customer_name.split(' ')[0] %></label><textarea id="admin-order-message" name="message" rows="4" placeholder="Write an update or answer here…" required></textarea><button class="admin-primary-button" type="submit">Send reply</button></form>
+      </section>
+    </div>
+    <aside>
+      <section class="admin-panel customer-card"><h2>Customer</h2><dl><div><dt>Name</dt><dd><%= order.customer_name %></dd></div><div><dt>Email</dt><dd><a href="mailto:<%= order.email %>"><%= order.email %></a></dd></div><% if (order.phone) { %><div><dt>Phone</dt><dd><a href="tel:<%= order.phone %>"><%= order.phone %></a></dd></div><% } %></dl></section>
+      <section class="admin-panel customer-card"><h2>Delivery address</h2><address><%= order.address_line_1 %><br><% if (order.address_line_2) { %><%= order.address_line_2 %><br><% } %><%= order.city %>, <%= order.state %> <%= order.postal_code %></address></section>
+      <% if (order.notes) { %><section class="admin-panel customer-card"><h2>Customer note</h2><p class="customer-note"><%= order.notes %></p></section><% } %>
+      <section class="admin-tip"><span>♡</span><p><strong>Payment reminder</strong><small>No online payment was collected. Contact the customer to confirm and arrange payment.</small></p></section>
+    </aside>
+  </div>
+<%- include('../partials/admin-footer') %>

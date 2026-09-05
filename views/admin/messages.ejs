@@ -1,0 +1,22 @@
+<%- include('../partials/head', { adminPage: true }) %>
+<body class="admin-body">
+<%- include('../partials/admin-header') %>
+  <div class="admin-page-heading"><div><a class="admin-back" href="/admin">← Owner home</a><h1>Messages</h1><p>Questions and custom requests sent from the contact page.</p></div></div>
+  <section class="message-list-section">
+    <div class="admin-subheading"><div><p class="admin-eyebrow">ORDER CONVERSATIONS</p><h2>Messages about orders</h2></div><p>Open an order to read and reply.</p></div>
+    <% if (orderThreads.length) { %><div class="admin-panel order-thread-list"><% orderThreads.forEach((thread) => { %><a href="/admin/orders/<%= thread.order_id %>#conversation" class="<%= thread.unread_count ? 'is-unread' : '' %>"><span class="thread-avatar"><%= thread.customer_name.slice(0,1).toUpperCase() %></span><div><strong><%= thread.customer_name %></strong><small><%= thread.order_number %> · <%= thread.body %></small></div><time><%= formatDate(thread.created_at, true) %></time><i><%= thread.unread_count ? `${thread.unread_count} new` : 'Open →' %></i></a><% }) %></div>
+    <% } else { %><div class="admin-panel admin-empty"><span>□</span><p>No order conversations yet.</p></div><% } %>
+  </section>
+  <section class="message-list-section" id="contact-messages">
+    <div class="admin-subheading"><div><p class="admin-eyebrow">GENERAL INBOX</p><h2>Contact messages</h2></div><p>Questions sent without an order.</p></div>
+    <div class="message-list">
+    <% if (messages.length) { %>
+      <% messages.forEach((message) => { %><article class="admin-panel message-card <%= message.is_read ? '' : 'is-unread' %>">
+        <div class="message-card-top"><div class="message-sender"><span><%= message.name.slice(0,1).toUpperCase() %></span><div><h2><%= message.name %></h2><a href="mailto:<%= message.email %>"><%= message.email %></a></div></div><div><time><%= formatDate(message.created_at, true) %></time><% if (!message.is_read) { %><i class="new-label">New</i><% } %></div></div>
+        <p class="message-body"><%= message.message %></p>
+        <div class="message-actions"><a class="admin-primary-button" href="mailto:<%= message.email %>?subject=<%= encodeURIComponent(`Your message to ${settings.store_name}`) %>">Reply by email</a><% if (!message.is_read) { %><form method="post" action="/admin/messages/<%= message.id %>/read"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="quiet-button" type="submit">Mark as read</button></form><% } %></div>
+      </article><% }) %>
+    <% } else { %><div class="admin-panel admin-empty roomy"><span>✉</span><h2>No messages yet.</h2><p>When someone uses the contact form, their note will appear here.</p></div><% } %>
+    </div>
+  </section>
+<%- include('../partials/admin-footer') %>

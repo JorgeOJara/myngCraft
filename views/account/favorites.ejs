@@ -1,0 +1,14 @@
+<%- include('../partials/head', { adminPage: false }) %>
+<body>
+<%- include('../partials/header') %>
+<main class="account-page">
+  <section class="account-welcome compact-account-welcome"><div class="shell"><p class="eyebrow">SAVED BY YOU</p><h1>My favorites</h1><p>A little collection of everything that caught your eye.</p></div></section>
+  <div class="shell account-shell">
+    <%- include('nav') %>
+    <section class="account-section-block first-account-block">
+      <% if (favorites.length) { %><div class="product-grid shop-product-grid"><% favorites.forEach((product) => { %><%- include('../partials/product-card', { product }) %><% }) %></div>
+      <% } else { %><div class="account-empty account-empty-large"><span>♡</span><div><h3>Your favorites are waiting.</h3><p>Use the heart on any shop item to save it here for later.</p></div><a class="button button-primary" href="/shop">Find something lovely</a></div><% } %>
+    </section>
+  </div>
+</main>
+<%- include('../partials/footer') %>

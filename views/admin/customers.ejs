@@ -1,0 +1,9 @@
+<%- include('../partials/head', { adminPage: true }) %>
+<body class="admin-body">
+<%- include('../partials/admin-header') %>
+  <div class="admin-page-heading"><div><a class="admin-back" href="/admin">← Owner home</a><h1>Customers</h1><p>People who created an account with your shop.</p></div></div>
+  <section class="admin-panel customers-panel">
+    <% if (customers.length) { %><div class="customer-admin-list"><div class="customer-admin-head"><span>Customer</span><span>Contact</span><span>Orders</span><span>Total ordered</span><span>Joined</span></div><% customers.forEach((person) => { %><article class="customer-admin-row"><div><span><%= person.first_name.slice(0,1).toUpperCase() %></span><strong><%= person.first_name %> <%= person.last_name %></strong></div><div><a href="mailto:<%= person.email %>"><%= person.email %></a><small><%= person.phone || 'No phone saved' %></small></div><strong><%= person.order_count %></strong><strong><%= money(person.total_spent_cents) %></strong><time><%= formatDate(person.created_at) %></time></article><% }) %></div>
+    <% } else { %><div class="admin-empty roomy"><span>♙</span><h2>No customer accounts yet.</h2><p>Customers will appear here after they create an account.</p></div><% } %>
+  </section>
+<%- include('../partials/admin-footer') %>

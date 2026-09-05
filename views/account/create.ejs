@@ -1,0 +1,30 @@
+<%- include('../partials/head', { adminPage: false }) %>
+<body>
+<%- include('../partials/header') %>
+<main>
+  <section class="customer-auth-section">
+    <div class="shell customer-auth-grid create-account-grid">
+      <div class="customer-auth-card reveal">
+        <p class="eyebrow">YOUR MYNGCRAFT ACCOUNT</p>
+        <h1>A lovely place to keep track.</h1>
+        <p>Create an account to save favorites, keep your bag between visits, follow orders, and talk with Myng.</p>
+        <% if (errors.length) { %><div class="account-alert account-alert-error" role="alert"><strong>Please check these details:</strong><ul><% errors.forEach((error) => { %><li><%= error %></li><% }) %></ul></div><% } %>
+        <form class="customer-auth-form" method="post" action="/account/create">
+          <input type="hidden" name="return_to" value="<%= returnTo %>">
+          <div class="auth-name-grid"><label>First name<input name="first_name" value="<%= values.first_name || '' %>" autocomplete="given-name" required></label><label>Last name<input name="last_name" value="<%= values.last_name || '' %>" autocomplete="family-name" required></label></div>
+          <label>Email address<input name="email" type="email" value="<%= values.email || '' %>" autocomplete="email" required></label>
+          <label>Password <small>At least 12 characters</small><div class="customer-password-field"><input name="password" type="password" minlength="12" maxlength="128" autocomplete="new-password" required><button type="button" data-customer-password-toggle>Show</button></div></label>
+          <label>Type the password again<input name="password_confirmation" type="password" autocomplete="new-password" required></label>
+          <button class="button button-primary customer-auth-submit" type="submit">Create my account</button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="/account/sign-in?return=<%= encodeURIComponent(returnTo) %>">Sign in</a></p>
+      </div>
+      <aside class="account-benefits reveal reveal-late">
+        <p class="eyebrow">ALL IN ONE PLACE</p>
+        <h2>Your account makes shopping easier.</h2>
+        <ul><li><span>♡</span><div><strong>Save your favorites</strong><small>Make a collection of pieces you love.</small></div></li><li><span>⌁</span><div><strong>Keep your bag</strong><small>Return later—even from another device.</small></div></li><li><span>□</span><div><strong>Follow every order</strong><small>See when it is in process, being made, or sent.</small></div></li><li><span>✉</span><div><strong>Talk directly with Myng</strong><small>Ask a question right inside an order.</small></div></li></ul>
+      </aside>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

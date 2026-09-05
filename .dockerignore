@@ -1,11 +1,12 @@
-node_modules/
-.env
-.env.*
-!.env.example
+node_modules
+.git
+.env*
 .admin-password-once
 data/*
 !data/.gitkeep
 public/uploads/*
 !public/uploads/.gitkeep
+test
+deploy
 *.log
 .DS_Store

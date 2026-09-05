@@ -1,0 +1,7 @@
+<nav class="account-nav" aria-label="My account">
+  <a href="/account" class="<%= currentPath === '/account' ? 'is-current' : '' %>">Overview</a>
+  <a href="/account/orders" class="<%= currentPath.startsWith('/account/orders') ? 'is-current' : '' %>">My orders</a>
+  <a href="/account/favorites" class="<%= currentPath === '/account/favorites' ? 'is-current' : '' %>">Favorites</a>
+  <a href="/account/profile" class="<%= currentPath === '/account/profile' ? 'is-current' : '' %>">My information</a>
+  <form method="post" action="/account/sign-out"><input type="hidden" name="_csrf" value="<%= customerCsrf %>"><button type="submit">Sign out</button></form>
+</nav>

@@ -1,0 +1,42 @@
+<%- include('../partials/head', { adminPage: false }) %>
+<body>
+<%- include('../partials/header') %>
+<main class="account-page">
+  <section class="account-welcome compact-account-welcome"><div class="shell"><p class="eyebrow">MY ACCOUNT</p><h1>My information</h1><p>Keep your contact and delivery details ready for a quicker checkout.</p></div></section>
+  <div class="shell account-shell">
+    <%- include('nav') %>
+    <div class="profile-grid first-account-block">
+      <section class="profile-card">
+        <div><p class="eyebrow">PROFILE & DELIVERY</p><h2>Your details</h2><p>Only you and the shop owner can see this information.</p></div>
+        <% if (saved) { %><div class="account-alert account-alert-success">✓ Your information was saved.</div><% } %>
+        <% if (profileErrors.length) { %><div class="account-alert account-alert-error"><strong>Please check these details:</strong><ul><% profileErrors.forEach((error) => { %><li><%= error %></li><% }) %></ul></div><% } %>
+        <form class="profile-form" method="post" action="/account/profile">
+          <input type="hidden" name="_csrf" value="<%= customerCsrf %>">
+          <div class="profile-field-grid"><label>First name<input name="first_name" value="<%= profile.first_name %>" autocomplete="given-name" required></label><label>Last name<input name="last_name" value="<%= profile.last_name %>" autocomplete="family-name" required></label></div>
+          <label>Email address<input name="email" type="email" value="<%= profile.email %>" autocomplete="email" required></label>
+          <label>Phone number <small>Optional</small><input name="phone" type="tel" value="<%= profile.phone %>" autocomplete="tel"></label>
+          <div class="form-divider"><span>Saved delivery address</span></div>
+          <label>Street address<input name="address_line_1" value="<%= profile.address_line_1 %>" autocomplete="address-line1"></label>
+          <label>Apartment, suite, etc. <small>Optional</small><input name="address_line_2" value="<%= profile.address_line_2 %>" autocomplete="address-line2"></label>
+          <div class="profile-field-grid"><label>City<input name="city" value="<%= profile.city %>" autocomplete="address-level2"></label><label>State<input name="state" value="<%= profile.state %>" autocomplete="address-level1"></label></div>
+          <label class="short-field">ZIP / postal code<input name="postal_code" value="<%= profile.postal_code %>" autocomplete="postal-code"></label>
+          <button class="button button-primary" type="submit">Save my information</button>
+        </form>
+      </section>
+
+      <section class="profile-card password-card">
+        <div><p class="eyebrow">SECURITY</p><h2>Change password</h2><p>Use at least 12 characters. A short phrase is easier to remember and harder to guess.</p></div>
+        <% if (passwordSaved) { %><div class="account-alert account-alert-success">✓ Your password was changed.</div><% } %>
+        <% if (passwordErrors.length) { %><div class="account-alert account-alert-error"><ul><% passwordErrors.forEach((error) => { %><li><%= error %></li><% }) %></ul></div><% } %>
+        <form class="profile-form" method="post" action="/account/password">
+          <input type="hidden" name="_csrf" value="<%= customerCsrf %>">
+          <label>Current password<input name="current_password" type="password" maxlength="128" autocomplete="current-password" required></label>
+          <label>New password<input name="new_password" type="password" minlength="12" maxlength="128" autocomplete="new-password" required></label>
+          <label>Type new password again<input name="new_password_confirmation" type="password" minlength="12" maxlength="128" autocomplete="new-password" required></label>
+          <button class="button button-outline" type="submit">Change my password</button>
+        </form>
+      </section>
+    </div>
+  </div>
+</main>
+<%- include('../partials/footer') %>

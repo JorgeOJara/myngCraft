@@ -1,0 +1,25 @@
+<%- include('../partials/head', { adminPage: true }) %>
+<body class="admin-body">
+<%- include('../partials/admin-header') %>
+  <div class="admin-page-heading">
+    <div><a class="admin-back" href="/admin">← Owner home</a><h1>Orders</h1><p>Open an order to see the customer, address, and items.</p></div>
+  </div>
+  <nav class="admin-filter-tabs" aria-label="Order view"><a class="<%= view === 'current' ? 'is-current' : '' %>" href="/admin/orders?view=current">Current orders</a><a class="<%= view === 'history' ? 'is-current' : '' %>" href="/admin/orders?view=history">Order history</a><a class="<%= view === 'all' ? 'is-current' : '' %>" href="/admin/orders?view=all">All orders</a></nav>
+  <section class="admin-panel orders-panel">
+    <% if (orders.length) { %>
+      <div class="order-list">
+        <div class="order-list-head"><span>Order</span><span>Customer</span><span>Date</span><span>Total</span><span>Status</span><span></span></div>
+        <% orders.forEach((order) => { %>
+          <a class="order-row" href="/admin/orders/<%= order.id %>">
+            <strong><%= order.order_number %></strong>
+            <span><%= order.customer_name %><small><%= order.email %></small></span>
+            <span><%= formatDate(order.created_at) %></span>
+            <strong><%= money(order.total_cents) %></strong>
+            <span><i class="status-pill status-<%= order.status %>"><%= statusLabel(order.status) %></i></span>
+            <b>Open →</b>
+          </a>
+        <% }) %>
+      </div>
+    <% } else { %><div class="admin-empty roomy"><span>□</span><h2><%= view === 'history' ? 'No order history yet.' : 'No current orders.' %></h2><p><%= view === 'history' ? 'Delivered and cancelled orders will stay here for reference.' : 'New customer orders will appear here as soon as they are placed.' %></p><a class="admin-secondary-button" href="/">View the shop</a></div><% } %>
+  </section>
+<%- include('../partials/admin-footer') %>

@@ -1,0 +1,37 @@
+<%- include('../partials/head', { adminPage: true }) %>
+<body class="admin-body">
+<%- include('../partials/admin-header') %>
+  <div class="admin-page-heading">
+    <div><p class="admin-eyebrow">YOUR STORE TODAY</p><h1>What would you like to do?</h1><p>Everything important is one tap away.</p></div>
+    <a class="admin-primary-button" href="/admin/products/new"><span aria-hidden="true">＋</span> Add a new item</a>
+  </div>
+
+  <section class="quick-action-grid" aria-label="Store shortcuts">
+    <a href="/admin/products/new" class="quick-action quick-action-primary"><span>＋</span><div><strong>Add a new item</strong><small>Photo, price, and quantity</small></div><i>→</i></a>
+    <a href="/admin/products" class="quick-action"><span>◇</span><div><strong>See my items</strong><small><%= stats.activeProducts %> in shop · <%= stats.draftProducts %> hidden</small></div><i>→</i></a>
+    <a href="/admin/orders" class="quick-action"><span>□</span><div><strong>Check orders</strong><small><%= stats.newOrders %> waiting for you</small></div><i>→</i></a>
+    <a href="/admin/messages" class="quick-action"><span>✉</span><div><strong>Read messages</strong><small><%= stats.unreadMessages %> unread</small></div><i>→</i></a>
+  </section>
+
+  <div class="admin-two-column">
+    <section class="admin-panel">
+      <div class="panel-heading"><div><p class="admin-eyebrow">RECENT</p><h2>Latest orders</h2></div><a href="/admin/orders">See all</a></div>
+      <% if (recentOrders.length) { %>
+        <div class="simple-list">
+          <% recentOrders.forEach((order) => { %><a href="/admin/orders/<%= order.id %>"><span class="status-dot status-<%= order.status %>"></span><div><strong><%= order.customer_name %></strong><small><%= order.order_number %> · <%= formatDate(order.created_at) %></small></div><b><%= money(order.total_cents) %></b></a><% }) %>
+        </div>
+      <% } else { %><div class="admin-empty"><span>□</span><p>No orders yet. New orders will appear right here.</p></div><% } %>
+    </section>
+    <section class="admin-panel">
+      <div class="panel-heading"><div><p class="admin-eyebrow">INBOX</p><h2>New messages</h2></div><a href="/admin/messages">See all</a></div>
+      <% if (recentMessages.length) { %>
+        <div class="message-preview-list">
+          <% recentOrderThreads.forEach((thread) => { %><a href="/admin/orders/<%= thread.order_id %>#conversation" class="<%= thread.unread_count ? 'is-unread' : '' %>"><span><%= thread.customer_name.slice(0, 1).toUpperCase() %></span><div><strong><%= thread.customer_name %> · <%= thread.order_number %></strong><small><%= thread.body %></small></div></a><% }) %>
+          <% recentMessages.forEach((message) => { %><a href="/admin/messages#contact-messages" class="<%= message.is_read ? '' : 'is-unread' %>"><span><%= message.name.slice(0, 1).toUpperCase() %></span><div><strong><%= message.name %></strong><small><%= message.message %></small></div></a><% }) %>
+        </div>
+      <% } else if (recentOrderThreads.length) { %>
+        <div class="message-preview-list"><% recentOrderThreads.forEach((thread) => { %><a href="/admin/orders/<%= thread.order_id %>#conversation" class="<%= thread.unread_count ? 'is-unread' : '' %>"><span><%= thread.customer_name.slice(0, 1).toUpperCase() %></span><div><strong><%= thread.customer_name %> · <%= thread.order_number %></strong><small><%= thread.body %></small></div></a><% }) %></div>
+      <% } else { %><div class="admin-empty"><span>✉</span><p>No messages yet. Customer notes will appear here.</p></div><% } %>
+    </section>
+  </div>
+<%- include('../partials/admin-footer') %>
